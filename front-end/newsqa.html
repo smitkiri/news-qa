@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>News QA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://thedigitalcard.site/css/ladda-themeless.min.css">
+    <style>
+        .custom-color {
+            background-color: orange;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>News QA</h2>
+        <p>Select a question from the dropdown below to load an article or paste your own article and question!</p>
+        <form method="POST">
+            <div class="form-group">
+                <label for="sel1">Question list</label>
+                <select class="form-control" id="selectQuestion">
+                    <option>Select Question</option>
+                    <option value="3cb1efaccb2bdf73ffdaa14abf7a145d47dc690d">Who will play a key role?</option>
+                    <option value="c48c4fd3c892828b7d993fe0c3e3d1cfd13d6a5c">What can pathology show?</option>
+                    <option value="a9127de5251ac8a39841af06122929a4489282ed">What is Richard's priority?</option>
+                    <option value="54c9692a522877e3e652cddd831e6658cba2b8ca">What was she best known for?</option>
+                    <option value="f5ba7bfd3a297c525fb15e4f5caa15f355da81f1">When did Gazprom resume the flow of gas?</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="comment">Article:</label>
+                <textarea class="form-control" rows="7" id="paragraph" name="paragraph"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="usr">Question:</label>
+                <input type="text" class="form-control" id="question">
+            </div>
+            <button type="button" class="btn btn-primary ladda-button" id="subBtn"
+                data-style="expand-right">Submit</button>
+        </form>
+        <br/>
+        <br/>
+        <h3 id="headerParagraph" class="d-none">Article Text</h3>
+        <p id="newParagraph"></p>
+        <h3 id="answerParagraph" class="d-none" style="white-space: pre-line">Answer </h3>
+        <p id="answer"></p>
+    </div>
+
+</body>
+<script src="spin.js"></script>
+<script src="ladda.js"></script>
+<script>
+    //On page load
+    $(document).ready(function () {
+        //Select box change event
+        $("#selectQuestion").change(function () {
+            var settings = {
+                "url": "https://fastapi-newsqa.wl.r.appspot.com/article/" + $(this).val(),
+                "method": "GET",
+                "timeout": 0,
+            };
+            //GET ajax request to get data from KEY
+            $.ajax(settings).done(function (response) {
+                $("#question").val($("#selectQuestion option:selected").text())
+                $("#paragraph").text(response.article);
+            });
+        });
+        //On submitting data to API
+        $("#subBtn").on("click", function (e) {
+            var laddaBtn = e.currentTarget;
+            var l = Ladda.create(laddaBtn);
+            l.start();
+            $("#headerParagraph").addClass("d-none");
+            $("#answerParagraph").addClass("d-none")
+            $("#newParagraph").html("")
+            $("#answer").html("")
+            var settings = {
+                "url": "https://fastapi-newsqa.wl.r.appspot.com/",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify({
+                    "text": $("#paragraph").val(),
+                    "question": $("#question").val()
+                }),
+            };
+            let mainParagraph = '';
+            //Function will replace text with HTML span tag with CSS class
+            function replaceText(str, char_ranges) {
+                mainParagraph = str;
+                for (range of char_ranges.reverse()) {
+                    console.log(range);
+                    if (range[1] > range[0]) {
+                        let answer = str.substring(range[0], range[1]);
+                        let answerWithHtml = `<span class=custom-color>${answer}</span>`
+                        mainParagraph = mainParagraph.substring(0, range[0]) + answerWithHtml + mainParagraph.substring(range[1]);
+                    }
+                }
+                return mainParagraph;
+            }
+            //POST request to API
+            $.ajax(settings).done(function (response) {
+                $("#headerParagraph").removeClass("d-none")
+                let answerHtml = replaceText($("#paragraph").val(), response.char_ranges);
+                // Preserve new lines
+                answerHtml = answerHtml.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                $("#newParagraph").html(answerHtml)
+                $("#answerParagraph").removeClass("d-none")
+                let str = '';
+                //Update Answer in text
+                for (text of response.answer_texts) {
+                    if (!!text) {
+                        str += `<span class="text-success">${text}</span></br>`
+                    }
+                }
+                if (str == '') {
+                    str = `<span class="text-danger">No answer found</span></br>`
+                }
+
+                $("#answer").html(str);
+                l.stop();
+            });
+        })
+    });
+</script>
+
+</html>

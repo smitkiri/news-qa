@@ -1,0 +1,11 @@
+cnn/
+data/bert_model.pt
+data/dataset_bert.pkl
+data/dataset_distilbert.pkl
+data/distilbert_model.pt
+data/examples.pkl
+data/newsqa-data-formatted.csv
+data/newsqa-dataset-cleaned.csv
+
+.ipynb_checkpoints/
+__pycache__/
