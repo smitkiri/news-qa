@@ -6,6 +6,6 @@ data/distilbert_model.pt
 data/examples.pkl
 data/newsqa-data-formatted.csv
 data/newsqa-dataset-cleaned.csv
-
+README.txt
 .ipynb_checkpoints/
 __pycache__/
