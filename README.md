@@ -14,9 +14,9 @@ Please review the files in the following order:
 
 To run the code present in files 1 to 5 on a sample of the data, use "Demo Code.ipynb"
 
-To test the API, run "uvicorn main:app --reload" and visit "http://127.0.0.1:8000/docs" or whatever port the app is running on your local machine. Alternatively, you can also visit "https://fastapi-newsqa.wl.r.appspot.com/docs" where the API is deployed. You need to have a trained model with path "data/bert_model.pt".
+To test the API, run "uvicorn main:app --reload" and visit "http://127.0.0.1:8000/docs" or whatever port the app is running on your local machine. You need to have a trained model with path "data/bert_model.pt".
 
-To view the front end, just open the file "front-end/newsqa.html" on a browser with a working internet connection. Alternatively, you can also visit "smitkiri.github.io/newsqa" where the front end is deployed.
+To view the front end, just open the file "front-end/newsqa.html" on a browser. You will have to change the url on line 68 and 88 of the file with your API's url.
 
 ## Problem Statement
 News Articles are usually very long, and the highlights  do not cover every important detail. If a person is interested in some detail of the news story, they have to go through the entire article, not just skim through it as they might miss details that they are looking for. This is sometimes inconvenient for a user as they might not have the time to go through it or they simply don’t like to read. A reading-comprehension based question answering model would help users to get details from a long news article by providing a question in natural language. 
