@@ -1,5 +1,5 @@
 fastapi==0.60.1
-numpy==1.19.0
+numpy==1.22.0
 torch
 torchvision
 transformers==3.0.2
